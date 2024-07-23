@@ -195,5 +195,13 @@ def get_model(model_type,model_path,args):
 
     elif model_type in ["vitvqgan"]:
         cur_model = pm.create_model(arch='vqgan', version='vit-s-vqgan', pretrained=True).cuda()
+        
+    def disabled_safety_checker(images, clip_input):
+        if len(images.shape)==4:
+            num_images = images.shape[0]
+            return images, [False]*num_images
+        else:
+            return images, False
+    cur_model.safety_checker = disabled_safety_checker
 
     return cur_model
