@@ -91,6 +91,10 @@ def get_image0(args):
         elif args.model_type in ["vqdiffusion"]:
             height = args.cur_model.transformer.height
             width = args.cur_model.transformer.width
+        elif args.model_type in ["cd-imagenet64-l2", "cd-imagenet64-lpips", "ct-imagenet64"]:
+            height = args.cur_model.unet.config.sample_size
+            width = args.cur_model.unet.config.sample_size
+        
         image0 = transforms.Resize(height)(image0)
         save_img_tensor(image0,"image0_sd_not_generated.png")
 
@@ -102,6 +106,8 @@ def get_image0(args):
         imsize = 1024
     elif args.model_type in ["vqdiffusion","vitvqgan"]:
         imsize = 256
+    elif args.model_type in ["cd-imagenet64-l2", "cd-imagenet64-lpips", "ct-imagenet64"]:
+        imsize = 64
     
     image0 = transforms.Resize((imsize,imsize))(image0)
     save_img_tensor(image0,"image0_final.png")

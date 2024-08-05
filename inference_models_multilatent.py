@@ -2,7 +2,7 @@
 import os
 import torch
 import pickle
-from diffusers import StableDiffusionPipeline,StableDiffusionXLPipeline,VQDiffusionPipeline,AutoPipelineForText2Image
+from diffusers import StableDiffusionPipeline,StableDiffusionXLPipeline,VQDiffusionPipeline,AutoPipelineForText2Image,ConsistencyModelPipeline
 from inference_utils import save_img_tensor
 import argparse
 from PIL import Image
@@ -195,6 +195,24 @@ def get_model(model_type,model_path,args):
 
     elif model_type in ["vitvqgan"]:
         cur_model = pm.create_model(arch='vqgan', version='vit-s-vqgan', pretrained=True).cuda()
+    
+    elif model_type in ["cd-imagenet64-l2"]:
+        model_id = "openai/diffusers-cd_imagenet64_l2"
+        cur_model = ConsistencyModelPipeline.from_pretrained(model_id,torch_dtype=torch.float32).to("cuda")
+        cur_model.unet.eval()
+        cur_model.vae.eval()
+        
+    elif model_type in ["cd-imagenet64-lpips"]:
+        model_id = "openai/diffusers-cd_imagenet64_lpips"
+        cur_model = ConsistencyModelPipeline.from_pretrained(model_id,torch_dtype=torch.float32).to("cuda")
+        cur_model.unet.eval()
+        cur_model.vae.eval()
+        
+    elif model_type in ["ct-imagenet64"]:
+        model_id = "openai/diffusers-ct_imagenet64"
+        cur_model = ConsistencyModelPipeline.from_pretrained(model_id,torch_dtype=torch.float32).to("cuda")
+        cur_model.unet.eval()
+        cur_model.vae.eval()
         
     def disabled_safety_checker(images, clip_input):
         if len(images.shape)==4:
